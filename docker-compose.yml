@@ -1,0 +1,59 @@
+version: '3.6'
+
+# //////////////////////////////////////////////////////////////////////////////
+#                                  SERVICES
+# //////////////////////////////////////////////////////////////////////////////
+
+services:
+
+ # ============== SDP GATEWAY ==============
+
+  sdp-gateway:
+    container_name: sdp-gateway
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    volumes:
+      - ./data/certs:/gateway/certs
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - sdp-net
+    depends_on:
+      - sdp-controller
+
+  # ============== SDP CLIENT ==============
+
+  sdp-client:
+    container_name: sdp-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    networks:
+      - sdp-net
+    volumes:
+      - ./data/certs:/client/certs
+    depends_on:
+      - sdp-controller
+
+
+  # ============== SDP CONTROLLER ==============
+
+  sdp-controller:
+    container_name: sdp-controller
+    build:
+      context: ./controller
+      dockerfile: Dockerfile
+    networks:
+      - sdp-net
+    ports:
+      - 5000:5000
+    volumes:
+      - ./data/certs:/controller/certs
+
+# //////////////////////////////////////////////////////////////////////////////
+#                                  NETWORKS
+# //////////////////////////////////////////////////////////////////////////////
+
+networks:
+  sdp-net: {}
